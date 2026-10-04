@@ -1707,8 +1707,11 @@ body.has-banner .title-ov { padding-bottom: 64px; }
   .energy b { font-size: 22px; }
   .end-turn { padding: 8px 14px; font-size: 13px; }
   .tgl { padding: 2px 6px; font-size: 10px; }
-  .field { top: 30%; gap: 12px; }
-  .unit { width: 62px; }
+  .field { top: 10px; transform: none; gap: 10px; }   
+  .unit { width: 60px; }
+  .unit-name { font-size: 10px; }
+  .unit-stats span { min-width: 18px; height: 18px; font-size: 11px; }
+  .unit-tags { display: none; }   
 }
 
 
