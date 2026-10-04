@@ -213,7 +213,7 @@
   $("field").innerHTML = field.map((u, i) => {
    const c = CARDS[u.key];
    const tags = [ u.partner && '<i class="tg partner">相棒</i>', u.ward && '<i class="tg ward">守護</i>', u.rush && '<i class="tg rush">突進</i>', u.double && '<i class="tg rush">2回</i>' ].filter(Boolean).join("");
-   return '<div class="unit' + (u.sleeping ? " sleeping" : "") + (u.down ? " down" : "") + (u.ward ? " ward" : "") + (u.partner ? " partner" : "") + (c.evolved ? " evo" : "") + '" data-i="' + i + '" data-id="' + u.id + '" data-key="' + u.key + '" style="--a:' + ATTRS[c.attr].main + '">' + '<div class="unit-pic">' + Art.html(c.art) + (u.sleeping ? '<span class="zz">zz</span>' : "") + (u.down ? '<span class="downmark">ダウン<b>' + u.down + "</b></span>" : "") + "</div>" + '<div class="unit-name">' + c.name + "</div>" + (tags ? '<div class="unit-tags">' + tags + "</div>" : "") + '<div class="unit-stats"><span class="u-atk">' + u.atk + '</span><span class="u-hp">' + Math.max(0, u.hp) + "</span></div>" + "</div>";
+   return '<div class="unit' + (u.sleeping ? " sleeping" : "") + (u.down ? " down" : "") + (u.ward ? " ward" : "") + (u.partner ? " partner" : "") + (c.evolved ? " evo" : "") + '" data-i="' + i + '" data-id="' + u.id + '" data-key="' + u.key + '" style="--a:' + ATTRS[c.attr].main + '">' + '<div class="unit-pic">' + Art.html(c.art) + (u.sleeping ? '<span class="zz">zz</span>' : "") + (u.down ? '<span class="downmark">ダウン<b>' + u.down + "</b></span>" : "") + '<div class="unit-stats"><span class="u-atk">' + u.atk + '</span><span class="u-hp">' + Math.max(0, u.hp) + "</span></div></div>" + '<div class="unit-name">' + c.name + "</div>" + (tags ? '<div class="unit-tags">' + tags + "</div>" : "") + "</div>";
   }).join("") + Array.from({
    length: Math.max(0, PLAYER.fieldMax - field.length)
   }, () => '<div class="unit empty"></div>').join("");
@@ -849,7 +849,7 @@
     slow = 1.7;
     intentHold = true;
     retrigger($("intent"), "act");
-    banner("敵のターン", "enemy");
+    banner("敵のターン", "foe");
     await pause(260);
     break;
 
@@ -948,7 +948,7 @@
  let press = null;
  document.addEventListener("pointerdown", e => {
   const el = e.target.closest(".card, .unit[data-key]");
-  if (!el || e.pointerType === "mouse") return;
+  if (!el || e.pointerType === "mouse" || el.closest("#hand")) return;
   press = setTimeout(() => {
    showTip(el);
    press = "shown";
@@ -1032,9 +1032,86 @@
    }
   }
  });
- $("hand").addEventListener("click", async e => {
-  const el = (e.pointerType !== "touch" && handPick && handPick.isConnected ? handPick : null) || e.target.closest(".card");
-  if (!el || busy || press === "shown") return;
+ let swipe = null, lastTouch = 0;
+ const SWIPE = 46;
+ const cardAtX = x => {
+  const hand = $("hand"), r = hand.getBoundingClientRect(), cards = [ ...hand.querySelectorAll(".card") ];
+  const base = cards[0] && cards[0].offsetParent === hand ? 0 : hand.offsetLeft, lx = x - r.left;
+  let pick = null, best = Infinity;
+  for (const c of cards) {
+   const left = c.offsetLeft - base, d = Math.abs(lx - (left + c.offsetWidth / 2));
+   if (d < best) {
+    best = d;
+    pick = c;
+   }
+  }
+  return pick;
+ };
+ const touchPick = el => {
+  if (liftEl && liftEl !== el) {
+   liftEl.classList.remove("lift", "tlift", "armed");
+   liftEl.style.removeProperty("--dy");
+  }
+  liftEl = handPick = el;
+  if (!el) {
+   clearPreview();
+   tip.hidden = true;
+   return;
+  }
+  el.classList.add("tlift");
+  showTip(el);
+  if (!el.classList.contains("off")) previewCard(+el.dataset.index); else clearPreview();
+ };
+ $("hand").addEventListener("pointerdown", e => {
+  if (e.pointerType !== "touch" || busy || !run || run.phase !== "battle") return;
+  const el = e.target.closest(".card");
+  if (!el) return;
+  lastTouch = Date.now();
+  swipe = {
+   id: e.pointerId,
+   x: e.clientX,
+   y: e.clientY,
+   el: el
+  };
+  touchPick(el);
+ });
+ document.addEventListener("pointermove", e => {
+  if (!swipe || e.pointerId !== swipe.id) return;
+  const dy = e.clientY - swipe.y;
+  if (dy > -SWIPE / 2) {
+   const el = cardAtX(e.clientX);
+   if (el && el !== swipe.el) {
+    swipe.el = el;
+    swipe.y = e.clientY;
+    touchPick(el);
+    return;
+   }
+  }
+  const up = Math.min(0, dy);
+  swipe.el.style.setProperty("--dy", up + "px");
+  swipe.el.classList.toggle("armed", up < -SWIPE && !swipe.el.classList.contains("off"));
+ });
+ const endSwipe = e => {
+  if (!swipe || e.pointerId !== swipe.id) return;
+  const s = swipe;
+  swipe = null;
+  lastTouch = Date.now();
+  const used = e.type === "pointerup" && e.clientY - s.y < -SWIPE;
+  s.el.classList.remove("armed");
+  s.el.style.removeProperty("--dy");
+  if (used) playCard(s.el);
+ };
+ document.addEventListener("pointerup", endSwipe);
+ document.addEventListener("pointercancel", endSwipe);
+ document.addEventListener("pointerdown", e => {
+  if (e.pointerType === "touch" && liftEl && !e.target.closest("#hand, .tip")) touchPick(null);
+ });
+ $("hand").addEventListener("click", e => {
+  if (Date.now() - lastTouch < 700) return;
+  playCard((e.pointerType !== "touch" && handPick && handPick.isConnected ? handPick : null) || e.target.closest(".card"));
+ });
+ async function playCard(el) {
+  if (!el || busy || press === "shown" || !run || run.phase !== "battle") return;
   const i = +el.dataset.index;
   if (!Rules.canPlay(run, i)) {
    Sound.sfx("deny");
@@ -1053,7 +1130,7 @@
   if (run !== r0) return;
   busy = false;
   afterAction();
- });
+ }
  async function endTurn() {
   if (busy || !run || run.phase !== "battle") return;
   busy = true;
@@ -1228,7 +1305,7 @@
   }, {
    id: "b-hand",
    el: () => $("hand"),
-   text: "カードを押して使う。長押しで説明。",
+   text: matchMedia("(hover: none)").matches ? "カードを<b>上へはじいて</b>使う。触ると説明。" : "カードを押して使う。",
    until: "play"
   }, {
    id: "b-end",

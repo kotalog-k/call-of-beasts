@@ -371,8 +371,8 @@ button:focus-visible { outline: 2px solid var(--crimson); outline-offset: 3px; }
 
 .banner.turn { top: 58%; }
 .banner.turn b { font-size: clamp(18px, 2.6vw, 26px); color: #8cc4f2; }
-.banner.enemy { top: 30%; }
-.banner.enemy b { color: #ff7a96; }
+.banner.foe { top: 30%; }
+.banner.foe b { color: #ff7a96; }
 .banner.act { top: 46%; }
 .banner.act b { font-size: clamp(20px, 3.2vw, 32px); letter-spacing: .12em; color: #fff; box-shadow: 0 0 0 2px var(--void), 0 0 0 3px var(--crimson), 0 0 0 5px var(--void); }
 .intent.act { animation: act .5s steps(3); }
@@ -1646,4 +1646,99 @@ body.has-banner .title-ov { padding-bottom: 64px; }
   .dx-top { gap: 8px; flex-wrap: nowrap; }
   .dx-top h2 { font-size: 22px; }
   .dx-tabs .ghost { white-space: nowrap; padding: 4px 8px; font-size: 11px; }
+}
+
+
+.unit { padding: 3px 3px 0; background: linear-gradient(180deg, #2b2234, #16111c); box-shadow: 0 0 0 1px #000, inset 0 0 0 1px rgba(255,255,255,.07), 0 3px 0 rgba(0,0,0,.35); }
+.unit:not(.empty)::before { content: ''; position: absolute; left: 3px; right: 3px; top: 0; height: 2px; z-index: 2; background: var(--a); opacity: .9; }
+.unit-pic { box-shadow: none; }
+.unit-name { margin: 0; padding: 3px 2px 4px; font-size: 11px; line-height: 1.2; letter-spacing: .04em; }
+.unit-stats { left: 3px; right: 3px; top: auto; bottom: 3px; z-index: 2; }
+.unit-stats span { min-width: 20px; height: 18px; padding: 0 4px; font-size: 12px; line-height: 1; }
+.u-atk { background: rgba(120,16,40,.92); box-shadow: 0 0 0 1px #000, inset 0 0 0 1px #ff6a88 !important; }
+.u-hp { background: rgba(18,90,54,.92); box-shadow: 0 0 0 1px #000, inset 0 0 0 1px #5fe0a0 !important; }
+.unit-tags { top: -7px; left: 50%; transform: translateX(-50%); z-index: 3; display: flex; gap: 2px; white-space: nowrap; }
+.tg { font-size: 9px; line-height: 13px; padding: 0 4px; background: #120e16; box-shadow: 0 0 0 1px #000; }
+.tg.ward { box-shadow: 0 0 0 1px #000, inset 0 0 0 1px #4a86c8; }
+.tg.rush { box-shadow: 0 0 0 1px #000, inset 0 0 0 1px #c8762a; }
+.tg.partner { color: #1a1206; background: #e8c070; box-shadow: 0 0 0 1px #000; }
+.unit.ward { box-shadow: 0 0 0 1px #000, 0 0 0 2px #4a86c8, 0 3px 0 rgba(0,0,0,.35); }
+.unit.partner, .unit.partner.ward { box-shadow: 0 0 0 1px #000, 0 0 0 2px #e8c070, 0 3px 0 rgba(0,0,0,.35); }
+.unit.partner .unit-name { color: #ffe6b0; }
+@media (min-width: 721px) {
+  .unit-name { font-size: 12px; }
+  .unit-stats span { min-width: 24px; height: 21px; font-size: 14px; }
+  .tg { font-size: 10px; line-height: 14px; }
+  .field { gap: 14px; padding-top: 6px; }
+}
+
+
+#hand { touch-action: none; }
+.hand .card.tlift { z-index: 5; transform: translateY(calc(var(--cw) * -.3 + var(--dy, 0px))) scale(1.08); transition: none; }
+.hand .card.tlift.armed { filter: brightness(1.25); box-shadow: 0 0 0 2px #fff0b0, 0 0 18px 4px rgba(255,211,106,.6); }
+
+
+#game { --mcap: 999vh; }
+.arena .monster.world { --mdot: min(var(--dot), calc(var(--mcap) / var(--sh))); width: calc(var(--sw) * var(--mdot)); height: calc(var(--sh) * var(--mdot)); }
+
+
+@media (max-width: 520px) and (orientation: portrait) {
+  #game { --cw: min(27vw, 118px); --mcap: 30svh; }
+  .arena { padding-bottom: 4px; }
+  .arena .monster.portrait, .arena .monster.portrait.boss { height: min(30svh, 260px); }
+  .enemy { gap: 4px; }
+  .enemy-plate { width: min(300px, 78vw); }
+  .player-hud { width: min(320px, 82vw); margin-top: 2px; }
+  .plate-name, .player-hud .plate-name { padding: 4px 10px 1px; font-size: 12px; gap: 6px; }
+  .attr-gem { width: 17px; height: 17px; font-size: 10px; }
+  .bar, .player-hud .bar { height: 12px; margin: 3px 10px 6px; }
+  .bar b, .player-hud .bar b { font-size: 10px; }
+  .status { padding: 0 10px 5px; }
+  .intent { font-size: 13px; padding: 2px 8px; }
+  .bottom { gap: 6px; padding: 0 8px 6px; }
+  .hand { min-height: calc(var(--cw) * 1.4); margin-bottom: 0; }
+  .energy { padding: 2px 8px 4px; }
+  .energy b { font-size: 22px; }
+  .end-turn { padding: 8px 14px; font-size: 13px; }
+  .tgl { padding: 2px 6px; font-size: 10px; }
+  .field { top: 30%; gap: 12px; }
+  .unit { width: 62px; }
+}
+
+
+@media (max-height: 520px) and (orientation: landscape) {
+  #game { --cw: min(22svh, 96px); --mcap: 30svh; }
+  .top { padding: 6px 12px 0; gap: 8px; }
+  .stage-name > span { padding: 3px 12px; font-size: 12px; gap: 8px; }
+  .pile { min-width: 40px; padding: 1px 6px 2px; }
+  .pile small { font-size: 9px; }
+  .pile b { font-size: 13px; }
+  .arena { padding: 0; }
+  .arena .monster.portrait, .arena .monster.portrait.boss { height: 30svh; padding: 3px; }
+  .enemy { gap: 2px; }
+  .intent { font-size: 12px; padding: 1px 8px; }
+  .intent .it svg { width: 14px; height: 14px; }
+  .enemy-plate { width: min(280px, 40vw); margin-top: 0; }
+  .player-hud { width: min(300px, 42vw); margin-top: 2px; }
+  .plate-name, .player-hud .plate-name { padding: 2px 8px 0; font-size: 11px; gap: 6px; }
+  .attr-gem { width: 15px; height: 15px; font-size: 9px; }
+  .bar, .player-hud .bar { height: 10px; margin: 2px 8px 4px; }
+  .bar b, .player-hud .bar b { font-size: 9px; }
+  .status { padding: 0 8px 3px; }
+  .st { font-size: 9px; padding: 0 4px; }
+  .bottom { padding: 0 10px 4px; gap: 10px; }
+  .hand { min-height: calc(var(--cw) * 1.4); margin-bottom: 0; }
+  .energy { min-width: 0; padding: 2px 8px 4px; }
+  .energy b { font-size: 22px; }
+  .mp-pips { grid-template-columns: repeat(10, 5px); }
+  .turn-box { gap: 4px; }
+  .tgl { padding: 1px 6px; font-size: 9px; }
+  .end-turn { padding: 7px 14px; font-size: 13px; }
+  
+  .field { top: 4px; left: 10px; transform: none; grid-auto-flow: column; gap: 8px; padding-top: 6px; }
+  .unit { width: min(64px, 17svh); }
+  .unit-name { font-size: 10px; padding: 2px 1px 3px; }
+  .unit-stats span { min-width: 18px; height: 16px; font-size: 11px; }
+  .tg { font-size: 8px; line-height: 12px; }
+  .tip { top: 6px; bottom: auto; max-height: calc(100svh - 12px); }
 }
