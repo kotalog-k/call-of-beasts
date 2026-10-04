@@ -1391,6 +1391,64 @@
   ov.hidden = true;
   ov.onclick = null;
  }
+ const FIT_MIN = .4;
+ let fitRaf = 0;
+ function fitOverlay() {
+  fitRaf = 0;
+  if (ov.hidden) return;
+  const kids = [ ...ov.children ].filter(k => !k.classList.contains("coach"));
+  if (!kids.length) return;
+  const cs = getComputedStyle(ov);
+  const ah = ov.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+  const aw = ov.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  const size = () => {
+   let h = 0, w = 0;
+   for (const k of kids) {
+    const r = k.getBoundingClientRect();
+    h += r.height;
+    w = Math.max(w, r.width);
+   }
+   return [ h + Math.max(0, kids.length - 1) * (parseFloat(cs.rowGap) || 0), w ];
+  };
+  kids.forEach(k => {
+   k.style.zoom = "";
+  });
+  let [h, w] = size();
+  let z = Math.min(1, ah / h, aw / w);
+  for (let i = 0; i < 3 && z < 1; i++) {
+   kids.forEach(k => {
+    k.style.zoom = z;
+   });
+   const [h2, w2] = size();
+   if (h2 <= ah + 1 && w2 <= aw + 1) break;
+   z = Math.max(FIT_MIN, z * Math.min(ah / h2, aw / w2) - .005);
+  }
+  if (z >= 1) kids.forEach(k => {
+   k.style.zoom = "";
+  });
+  ov.classList.toggle("fitted", z < 1);
+ }
+ const refit = () => {
+  if (!fitRaf) fitRaf = requestAnimationFrame(fitOverlay);
+ };
+ const fitRO = new ResizeObserver(refit);
+ fitRO.observe(ov);
+ ov.addEventListener("load", refit, true);
+ if (document.fonts) document.fonts.ready.then(refit);
+ new MutationObserver(() => {
+  fitRO.disconnect();
+  fitRO.observe(ov);
+  [ ...ov.children ].forEach(k => fitRO.observe(k));
+ }).observe(ov, {
+  childList: true
+ });
+ new MutationObserver(refit).observe(ov, {
+  childList: true,
+  subtree: true,
+  attributes: true,
+  attributeFilter: [ "class", "hidden" ]
+ });
+ window.addEventListener("resize", refit);
  function levelupHTML(list) {
   if (!list.length) return "";
   return '<div class="levelups">' + list.map(l => {
@@ -1421,17 +1479,25 @@
  document.addEventListener("click", e => {
   if (e.target.closest(".bottom [data-snd]")) soundClick(e);
  });
- function showGuide(back) {
+ function showGuide(back, page = 0) {
   const step = (t, d, cls) => '<div class="g-step ' + (cls || "") + '"><b>' + t + "</b><small>" + d + "</small></div>";
   const arrow = '<i class="g-arrow">→</i>';
   if (!run) setBg("dragon");
-  open('<div class="dialog guide">' + "<h2>遊び方</h2>" + '<section class="g-sec"><h3>目的</h3>' + '<p class="g-lead">カードで戦いながら<b>10階</b>まで進み、<b>ボス</b>を倒せばクリア。<br>自分の<b>HPが0</b>になると、その冒険は終わり。</p></section>' + '<section class="g-sec"><h3>1回の冒険の流れ</h3><div class="g-flow">' + step("ロビー", "相棒と準備") + arrow + step("地図", "行き先をえらぶ") + arrow + step("戦闘・売店・訓練所・？", "マスの中身しだい。<br>ミッションを達成するとお金") + arrow + step("ほうび", "カードを1枚。<br>倒した敵のカードも手に入る") + arrow + step("ロビーへ", "これをくり返す") + '</div><p class="g-note">10階のボスを倒すか、HPが0になると冒険が終わる。HPは戦闘のたびに全回復する。</p></section>' + '<section class="g-sec"><h3>戦闘のきほん</h3><div class="g-grid">' + "<div><b>MP</b><p>カード左上の数字ぶん使う。<br>最大MPはターンごとに1ずつ増える（10まで）。</p></div>" + '<div><b>カードの種類</b><p><span class="k-atk">攻撃</span> 敵にダメージ<br><span class="k-def">防御</span> 次の攻撃を防ぐ<br><span class="k-mag">魔法</span> 引く・弱らせるなど<br><span class="k-gd">召喚獣</span> 場に残って毎ターン攻撃</p></div>' + "<div><b>相棒</b><p>最初から場にいる召喚獣。<br>やられても2ターンで戻ってくる（1回の戦闘に1度）。</p></div>" + "<div><b>敵の予告</b><p>敵の上に「次にすること」が出る。<br>赤い照準が、狙われている相手。</p></div>" + "</div></section>" + '<section class="g-sec"><h3>冒険が終わると</h3><div class="g-two">' + '<div class="keep"><b>残るもの</b><ul><li>カードのレベル</li><li>手に入れたカード（コレクションへ）</li><li>お金（冒険の終わりに、進んだ階ぶんのほうびも）</li><li>図鑑（相棒にえらべるモンスター）</li><li>相棒の進化</li></ul></div>' + '<div class="lost"><b>その冒険だけ</b><ul><li>冒険中に増えたデッキ</li><li>HP</li></ul></div>' + "</div></section>" + '<section class="g-sec"><h3>強くなる方法</h3><div class="g-flow wrap">' + step("パック", "お金でカードを集める。<br>まれに<b>でんせつの召喚獣</b>") + step("デッキ編成", "集めたカードで15枚") + step("レベル", "カードは使うほど育つ") + step("図鑑", "倒した敵が相棒になる") + step("進化", "同じモンスター2枚で進化。<br>相棒の進化は次も使える") + "</div></section>" + '<div class="title-btns"><button class="ghost" data-hints>戦闘中のヒントをもう一度出す</button><button class="end-turn" data-back>もどる</button></div>' + "</div>", "scroll", e => {
+  const pages = [ [ "目的", '<p class="g-lead">カードで戦いながら<b>10階</b>まで進み、<b>ボス</b>を倒せばクリア。<br>自分の<b>HPが0</b>になると、その冒険は終わり。</p>' + '<p class="g-note">HPは戦闘のたびに全回復する。負けても、集めたカードと相棒の強さは次の冒険へ持ちこせる。</p>' ], [ "冒険の流れ", '<div class="g-flow">' + step("ロビー", "相棒と準備") + arrow + step("地図", "行き先をえらぶ") + arrow + step("戦闘・売店・訓練所・？", "マスの中身しだい。<br>ミッションを達成するとお金") + arrow + step("ほうび", "カードを1枚。<br>倒した敵のカードも手に入る") + arrow + step("ロビーへ", "これをくり返す") + '</div><p class="g-note">10階のボスを倒すか、HPが0になると冒険が終わる。</p>' ], [ "戦闘のきほん", '<div class="g-grid">' + "<div><b>MP</b><p>カード左上の数字ぶん使う。<br>最大MPはターンごとに1ずつ増える（10まで）。</p></div>" + '<div><b>カードの種類</b><p><span class="k-atk">攻撃</span> 敵にダメージ<br><span class="k-def">防御</span> 次の攻撃を防ぐ<br><span class="k-mag">魔法</span> 引く・弱らせるなど<br><span class="k-gd">召喚獣</span> 場に残って毎ターン攻撃</p></div>' + "<div><b>相棒</b><p>最初から場にいる召喚獣。<br>やられても2ターンで戻ってくる（1回の戦闘に1度）。</p></div>" + "<div><b>敵の予告</b><p>敵の上に「次にすること」が出る。<br>赤い照準が、狙われている相手。</p></div></div>" ], [ "冒険が終わると", '<div class="g-two">' + '<div class="keep"><b>残るもの</b><ul><li>カードのレベル</li><li>手に入れたカード（コレクションへ）</li><li>お金（冒険の終わりに、進んだ階ぶんのほうびも）</li><li>図鑑（相棒にえらべるモンスター）</li><li>相棒の進化</li></ul></div>' + '<div class="lost"><b>その冒険だけ</b><ul><li>冒険中に増えたデッキ</li><li>HP</li></ul></div></div>' ], [ "強くなる方法", '<div class="g-flow wrap">' + step("パック", "お金でカードを集める。<br>まれに<b>でんせつの召喚獣</b>") + step("デッキ編成", "集めたカードで15枚") + step("レベル", "カードは使うほど育つ") + step("図鑑", "倒した敵が相棒になる") + step("進化", "同じモンスター2枚で進化。<br>相棒の進化は次も使える") + "</div>" + '<div class="title-btns"><button class="ghost" data-hints>戦闘中のヒントをもう一度出す</button></div>' ] ];
+  page = Math.max(0, Math.min(pages.length - 1, page));
+  const tabs = pages.map((p, i) => '<button class="ghost g-tab' + (i === page ? " on" : "") + '" data-gpage="' + i + '">' + p[0] + "</button>").join("");
+  open('<div class="dialog guide">' + '<h2>遊び方</h2><div class="g-tabs">' + tabs + "</div>" + '<section class="g-sec"><h3>' + pages[page][0] + "</h3>" + pages[page][1] + "</section>" + '<div class="title-btns">' + (page > 0 ? '<button class="ghost" data-gpage="' + (page - 1) + '">← 前へ</button>' : "") + (page < pages.length - 1 ? '<button class="end-turn" data-gpage="' + (page + 1) + '">次へ →</button>' : "") + '<button class="' + (page < pages.length - 1 ? "ghost" : "end-turn") + '" data-back>もどる</button></div>' + "</div>", "scroll", e => {
    if (e.target.closest("[data-hints]")) {
     pref.tut = {};
     savePref();
     Sound.sfx("select");
     e.target.closest("[data-hints]").textContent = "次の冒険でヒントが出る";
     return;
+   }
+   const g = e.target.closest("[data-gpage]");
+   if (g) {
+    Sound.sfx("select");
+    return showGuide(back, +g.dataset.gpage);
    }
    if (e.target.closest("[data-back]")) {
     Sound.sfx("select");
@@ -1450,7 +1516,7 @@
   }).join("");
   return '<div class="boss-row"><h3>ボス討伐 ' + n + " / " + all.length + '</h3><div class="bs-list">' + cells + "</div></div>";
  }
- function showDex(back, tab = "mon", sel) {
+ function showDex(back, tab = "mon", sel, cpage = 0) {
   const sv = Rules.save(), seen = k => !!sv.seen[k];
   const nSeen = DEX_ORDER.filter(seen).length, nCard = DEX_CARDS.filter(ownCard).length;
   let body;
@@ -1464,12 +1530,14 @@
    const detail = ok ? '<div class="dx-detail" style="--a:' + at.main + '">' + '<div class="dx-big">' + dexPic(sel, true) + "</div>" + '<div class="dx-head"><span class="attr-gem" style="--a:' + at.main + ";--ad:" + at.deep + '">' + at.name + "</span><b>" + en.name + "</b>" + (en.boss ? '<i class="dx-tag">' + (en.last ? "ほんとうの最後のボス" : en.final ? "最後のボス" : "ボス") + "</i>" : "") + "</div>" + '<dl class="dx-facts"><dt>住む場所</dt><dd>' + h.name + (en.boss ? "（10階）" : "（" + h.floor + "階から）") + "</dd>" + "<dt>体力</dt><dd>" + en.hp + "" + "</dd>" + "<dt>倒した数</dt><dd>" + (sv.kills[sel] || 0) + "</dd>" + "<dt>倒すと</dt><dd>" + (en.card ? CARDS[en.card].name + "のカード" + "" : "ふつうのカードから1枚") + "</dd></dl>" + (passiveHTML(en) ? '<h4>とくせい</h4><div class="dx-pass">' + passiveHTML(en).replace(/title="([^"]*)">([^<]*)</g, ">$2<small>$1</small><") + "</div>" : "") + "<h4>行動（上から順にくり返す）</h4>" + acts(en.intents) + (en.phase2 ? "<h4>HPが半分を切ると「" + en.phase2.name + "」</h4>" + acts(en.phase2.intents) : "") + "</div>" : '<div class="dx-detail unknown"><div class="dx-big">' + dexPic(sel, false) + '</div><div class="dx-head"><b>？？？</b></div>' + '<p class="dim">まだ出会っていない。' + (en.last ? ENEMIES[FINAL_BOSS].name + "を倒すと、10階に現れる。" : en.final ? "3体のボスをすべて倒すと、10階に現れる。" : en.boss ? "10階で待っている。" : h.name + "（" + h.floor + "階）あたりにいる。") + "</p></div>";
    body = '<div class="dx-mon"><div class="dx-grid">' + tiles + "</div>" + detail + "</div>";
   } else {
-   const cards = DEX_CARDS.map(k => {
+   const PER = 10, pages = Math.ceil(DEX_CARDS.length / PER);
+   cpage = Math.max(0, Math.min(pages - 1, cpage));
+   const cards = DEX_CARDS.slice(cpage * PER, cpage * PER + PER).map(k => {
     const own = ownCard(k), c = CARDS[k];
     if (!own && c.packOnly) return '<div class="dx-card legend-back"><span>でんせつ</span><small>パックからまれに</small></div>';
     return '<div class="dx-card' + (own ? "" : " unowned") + '">' + cardHTML(k) + (own ? "" : "<small>" + (c.unit ? "倒すと手に入る" : "パック・報酬") + "</small>") + "</div>";
    }).join("");
-   body = '<div class="dx-cards">' + cards + "</div>";
+   body = '<div class="dx-cards">' + cards + "</div>" + '<div class="dx-pager"><button class="ghost" data-cpage="' + (cpage - 1) + '"' + (cpage ? "" : " disabled") + ">← 前へ</button><span>" + (cpage + 1) + " / " + pages + "</span>" + '<button class="ghost" data-cpage="' + (cpage + 1) + '"' + (cpage < pages - 1 ? "" : " disabled") + ">次へ →</button></div>";
   }
   open('<div class="dialog dex">' + '<div class="dx-top"><h2>図鑑</h2><div class="dx-tabs">' + '<button class="ghost' + (tab === "mon" ? " on" : "") + '" data-tab="mon">モンスター<b>' + nSeen + " / " + DEX_ORDER.length + "</b></button>" + '<button class="ghost' + (tab === "card" ? " on" : "") + '" data-tab="card">カード<b>' + nCard + " / " + DEX_CARDS.length + "</b></button>" + '</div><button class="end-turn" data-back>もどる</button></div>' + body + "</div>", "scroll lobby-ov dex-ov", e => {
    if (e.target.closest("[data-back]")) {
@@ -1485,6 +1553,11 @@
    if (m) {
     Sound.sfx("card");
     return showDex(back, "mon", m.dataset.mon);
+   }
+   const cp = e.target.closest("[data-cpage]");
+   if (cp && !cp.disabled) {
+    Sound.sfx("select");
+    return showDex(back, "card", null, +cp.dataset.cpage);
    }
   });
  }

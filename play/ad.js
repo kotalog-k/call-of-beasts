@@ -12,6 +12,7 @@
   }
  };
  let FPS = 12, DIR = "", DATA = null, KIND = null;
+ const EMBED = /[?&]embed=1/.test(location.search) && window.parent !== window;
  let el = null, raf = 0, timers = [], amb = null;
  function classroomSound() {
   let ac;
@@ -234,6 +235,20 @@
     Sound.bgm("boss");
    } catch (e) {}
   });
+  if (EMBED) {
+   at(tEnd + BOSS_END, () => {
+    try {
+     Sound.bgm(null);
+    } catch (e) {}
+    el && el.classList.add("out");
+   });
+   at(tEnd + BOSS_END + .7, () => {
+    try {
+     parent.postMessage("cob-ad-done", location.origin);
+    } catch (e) {}
+   });
+   return;
+  }
   at(tEnd + BOSS_END, () => {
    send("title");
    try {
@@ -264,7 +279,14 @@
    once: true
   });
  }
- if (KINDS[location.hash]) window.addEventListener("load", () => setTimeout(ready, 300));
+ if (KINDS[location.hash]) window.addEventListener("load", () => setTimeout(() => {
+  if (!EMBED) return ready();
+  ready();
+  try {
+   Sound.unlock();
+  } catch (e) {}
+  play();
+ }, 300));
  window.addEventListener("hashchange", () => {
   if (KINDS[location.hash]) ready();
  });

@@ -1609,3 +1609,41 @@ body.has-banner .title-ov { padding-bottom: 64px; }
 .ad-test div { display: grid; gap: 14px; justify-items: center; }
 .ad-test small { opacity: .6; letter-spacing: .2em; }
 .ad-test b { font-size: 40px; }
+
+
+.g-tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.g-tab { padding: 4px 12px; font-size: 12px; }
+.g-tab.on { box-shadow: inset 0 0 0 1px #000, inset 0 0 0 2px #e8c070; color: #fff4d8; }
+.guide .g-sec { min-height: 200px; }
+.dx-pager { display: flex; align-items: center; justify-content: center; gap: 14px; width: 100%; }
+.dx-pager span { font-size: 13px; color: #e8c070; }
+.dx-cards { grid-template-columns: repeat(5, minmax(0, 1fr)) !important; }
+
+
+@media (max-height: 520px) and (orientation: landscape) {
+  .overlay.scroll { padding: 8px 12px; }
+  .title-wrap .title-screen { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 18px; row-gap: 6px; max-width: 820px; padding: 10px 16px; align-items: center; }
+  .title-screen > * { grid-column: 2; }
+  .title-screen > h2 { grid-column: 1 / -1; font-size: 28px; }
+  .title-screen > .partner-pick { grid-column: 1; grid-row: 2 / span 7; flex-direction: column; gap: 6px; }
+  .title-screen .partner-pick .title-hero { height: 120px; }
+  .title-screen .narrow-only { display: none !important; }
+  .title-screen .howto { padding: 3px 10px; font-size: 11px; }
+  .dx-mon { grid-template-columns: minmax(0, 1fr) 240px; }
+  .dx-detail { position: sticky; }
+  .dx-grid { grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)); gap: 4px; }
+  .dx-tile b { font-size: 9px; }
+  .dx-top h2 { font-size: 22px; }
+}
+
+@media (max-width: 520px) and (orientation: portrait) {
+  .dx-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+  .dx-tile b { font-size: 8px; padding: 2px; }
+  .dx-tile small { font-size: 8px; }
+  .dx-big .dx-pic { aspect-ratio: 2 / 1; }
+}
+@media (max-width: 520px) and (orientation: portrait) {
+  .dx-top { gap: 8px; flex-wrap: nowrap; }
+  .dx-top h2 { font-size: 22px; }
+  .dx-tabs .ghost { white-space: nowrap; padding: 4px 8px; font-size: 11px; }
+}
