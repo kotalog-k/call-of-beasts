@@ -6,5 +6,7 @@ self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Pr
 self.addEventListener('fetch', e => {
   const u = new URL(e.request.url);
   if (e.request.method !== 'GET' || u.origin !== location.origin) return;     // 広告など、よそのものはそのまま
-  e.respondWith(caches.match(e.request, { ignoreSearch: true }).then(r => r || fetch(e.request)));
+  // ページ本体は、まずネットから新しい版を取る（古い版が出つづけないように）。電波が無いときだけ、しまってある版
+  if (e.request.mode === 'navigate') { e.respondWith(fetch(e.request).then(r => { const c = r.clone(); caches.open(VER).then(k => k.put('./', c)); return r; }).catch(() => caches.match('./'))); return; }
+  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match(e.request, { ignoreSearch: true }))));
 });
