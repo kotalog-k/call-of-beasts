@@ -12,6 +12,7 @@
   }
  };
  let FPS = 12, DIR = "", DATA = null, KIND = null;
+ const AD_VER = 2;
  const EMBED = /[?&]embed=1/.test(location.search) && window.parent !== window;
  let el = null, raf = 0, timers = [], amb = null;
  function classroomSound() {
@@ -158,13 +159,21 @@
    };
    game.onload = poll;
   });
-  const ver = Date.now();
   const frames = Array.from({
    length: DATA.n
-  }, (_, i) => DIR + "f" + String(i).padStart(3, "0") + ".png?v=" + ver);
+  }, (_, i) => DIR + "f" + String(i).padStart(3, "0") + ".webp?v=" + AD_VER);
+  const bar = div("ad-load", "<i></i>");
+  el.appendChild(bar);
+  let got = 0;
+  const keep = [];
   const pre = Promise.all(frames.map(src => new Promise(r => {
    const i = new Image;
-   i.onload = i.onerror = r;
+   keep.push(i);
+   i.onload = i.onerror = () => {
+    got++;
+    bar.firstChild.style.width = got / frames.length * 100 + "%";
+    r();
+   };
    i.src = src;
   })));
   const box = div("ad-orbit");
@@ -174,7 +183,10 @@
   pic.className = "ad-frame";
   pic.alt = "";
   box.appendChild(pic);
-  Promise.all([ pre, ready ]).then(() => start(game, box, pic, frames));
+  Promise.all([ pre, ready ]).then(() => {
+   bar.remove();
+   start(game, box, pic, frames);
+  });
  }
  function start(game, box, pic, frames) {
   if (KIND.amb) amb = KIND.amb();
@@ -279,14 +291,16 @@
    once: true
   });
  }
- if (KINDS[location.hash]) window.addEventListener("load", () => setTimeout(() => {
-  if (!EMBED) return ready();
-  ready();
+ if (EMBED && KINDS[location.hash]) {
+  KIND = KINDS[location.hash];
+  DIR = KIND.dir;
+  DATA = KIND.data();
+  FPS = DATA && DATA.fps || 12;
   try {
    Sound.unlock();
   } catch (e) {}
   play();
- }, 300));
+ } else if (KINDS[location.hash]) window.addEventListener("load", () => setTimeout(ready, 300));
  window.addEventListener("hashchange", () => {
   if (KINDS[location.hash]) ready();
  });

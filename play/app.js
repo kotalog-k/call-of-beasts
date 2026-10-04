@@ -176,6 +176,7 @@
    }
    mon.style.setProperty("--spr", spr ? "url(art/spr_" + b.enemy.key + ".png)" : "none");
    FX.summon(game, mon, en.attr);
+   game.style.removeProperty("--mcap");
   }
   mon.classList.toggle("enraged", !!b.enemy.enraged);
   $("enemy").style.setProperty("--en", at.main);
@@ -213,7 +214,7 @@
   $("field").innerHTML = field.map((u, i) => {
    const c = CARDS[u.key];
    const tags = [ u.partner && '<i class="tg partner">相棒</i>', u.ward && '<i class="tg ward">守護</i>', u.rush && '<i class="tg rush">突進</i>', u.double && '<i class="tg rush">2回</i>' ].filter(Boolean).join("");
-   return '<div class="unit' + (u.sleeping ? " sleeping" : "") + (u.down ? " down" : "") + (u.ward ? " ward" : "") + (u.partner ? " partner" : "") + (c.evolved ? " evo" : "") + '" data-i="' + i + '" data-id="' + u.id + '" data-key="' + u.key + '" style="--a:' + ATTRS[c.attr].main + '">' + '<div class="unit-pic">' + Art.html(c.art) + (u.sleeping ? '<span class="zz">zz</span>' : "") + (u.down ? '<span class="downmark">ダウン<b>' + u.down + "</b></span>" : "") + '<div class="unit-stats"><span class="u-atk">' + u.atk + '</span><span class="u-hp">' + Math.max(0, u.hp) + "</span></div></div>" + '<div class="unit-name">' + c.name + "</div>" + (tags ? '<div class="unit-tags">' + tags + "</div>" : "") + "</div>";
+   return '<div class="unit' + (u.sleeping ? " sleeping" : "") + (u.down ? " down" : "") + (u.ward ? " ward" : "") + (u.partner ? " partner" : "") + (c.evolved ? " evo" : "") + '" data-i="' + i + '" data-id="' + u.id + '" data-key="' + u.key + '" style="--a:' + ATTRS[c.attr].main + '">' + '<div class="unit-pic">' + Art.html(c.art) + (u.sleeping ? '<span class="zz">zz</span>' : "") + (u.down ? '<span class="downmark">ダウン<b>' + u.down + "</b></span>" : "") + "</div>" + '<div class="unit-name">' + c.name + "</div>" + (tags ? '<div class="unit-tags">' + tags + "</div>" : "") + '<div class="unit-stats"><span class="u-atk">' + u.atk + '</span><span class="u-hp">' + Math.max(0, u.hp) + "</span></div>" + "</div>";
   }).join("") + Array.from({
    length: Math.max(0, PLAYER.fieldMax - field.length)
   }, () => '<div class="unit empty"></div>').join("");
@@ -274,6 +275,7 @@
    $("n-draw").textContent = b.drawPile.length;
    $("n-discard").textContent = b.discard.length;
   }
+  if (run.phase === "battle") requestAnimationFrame(fitArena);
   const canAny = Rules.anyPlayable(run);
   $("end-turn").disabled = busy || run.phase !== "battle";
   $("end-turn").classList.toggle("ready", !canAny && !busy);
@@ -317,6 +319,17 @@
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 1500);
  }
+ function fitArena() {
+  if (!run || run.phase !== "battle") return;
+  const mon = $("monster"), hud = $("player"), hand = $("hand");
+  if (!mon || !hud || !hand || !mon.offsetHeight) return;
+  const over = hud.getBoundingClientRect().bottom + 6 - hand.getBoundingClientRect().top;
+  if (over > 1) game.style.setProperty("--mcap", Math.max(80, mon.offsetHeight - over * 2) + "px");
+ }
+ addEventListener("resize", () => {
+  game.style.removeProperty("--mcap");
+  requestAnimationFrame(fitArena);
+ });
  function banner(text, cls) {
   game.querySelectorAll(".banner").forEach(x => x.remove());
   const el = document.createElement("div");
@@ -846,11 +859,11 @@
     break;
 
    case "enemyTurn":
-    slow = 1.7;
+    slow = 2.6;
     intentHold = true;
     retrigger($("intent"), "act");
     banner("敵のターン", "foe");
-    await pause(260);
+    await pause(380);
     break;
 
    case "enemyAct":
@@ -859,7 +872,7 @@
      if (t) {
       retrigger($("monster"), "charge");
       banner(t, "act");
-      await pause(320);
+      await pause(560);
      }
      break;
     }

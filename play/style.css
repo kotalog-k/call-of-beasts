@@ -1649,27 +1649,33 @@ body.has-banner .title-ov { padding-bottom: 64px; }
 }
 
 
-.unit { padding: 3px 3px 0; background: linear-gradient(180deg, #2b2234, #16111c); box-shadow: 0 0 0 1px #000, inset 0 0 0 1px rgba(255,255,255,.07), 0 3px 0 rgba(0,0,0,.35); }
-.unit:not(.empty)::before { content: ''; position: absolute; left: 3px; right: 3px; top: 0; height: 2px; z-index: 2; background: var(--a); opacity: .9; }
-.unit-pic { box-shadow: none; }
-.unit-name { margin: 0; padding: 3px 2px 4px; font-size: 11px; line-height: 1.2; letter-spacing: .04em; }
-.unit-stats { left: 3px; right: 3px; top: auto; bottom: 3px; z-index: 2; }
-.unit-stats span { min-width: 20px; height: 18px; padding: 0 4px; font-size: 12px; line-height: 1; }
-.u-atk { background: rgba(120,16,40,.92); box-shadow: 0 0 0 1px #000, inset 0 0 0 1px #ff6a88 !important; }
-.u-hp { background: rgba(18,90,54,.92); box-shadow: 0 0 0 1px #000, inset 0 0 0 1px #5fe0a0 !important; }
-.unit-tags { top: -7px; left: 50%; transform: translateX(-50%); z-index: 3; display: flex; gap: 2px; white-space: nowrap; }
-.tg { font-size: 9px; line-height: 13px; padding: 0 4px; background: #120e16; box-shadow: 0 0 0 1px #000; }
-.tg.ward { box-shadow: 0 0 0 1px #000, inset 0 0 0 1px #4a86c8; }
+.unit { aspect-ratio: 576 / 800; padding: 0; background: #0c0a10; box-shadow: 0 4px 0 rgba(0,0,0,.4); }
+.unit:not(.empty)::before { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: url(art/frame_guardian.png) 0 0 / 100% 100% no-repeat; image-rendering: pixelated; }
+.unit.ward::before { background-image: url(art/frame_defense.png); }
+.unit.ward, .unit.partner, .unit.partner.ward { box-shadow: 0 4px 0 rgba(0,0,0,.4); }
+.unit.partner::before { filter: brightness(1.12) saturate(1.15) drop-shadow(0 0 5px rgba(255,210,120,.45)); }
+.unit-pic { position: absolute; inset: 7% 8.5%; aspect-ratio: auto; box-shadow: none; }
+.unit-name { position: absolute; left: 8.5%; right: 8.5%; bottom: 7%; z-index: 1; margin: 0; padding: 12% 2px 3%; font-size: 11px; line-height: 1.2;
+  background: linear-gradient(180deg, transparent, rgba(6,4,10,.88) 45%); text-shadow: 1px 1px 0 #000; }
+.unit.partner .unit-name { color: #ffe6b0; }
+.unit-stats { left: 0; right: 0; top: 1%; bottom: auto; z-index: 3; padding: 0 1%; }
+.unit-stats span { min-width: 20px; height: 20px; padding: 0 4px; font-size: 12px; line-height: 1; }
+.u-atk { background: linear-gradient(180deg, #c8304e, #7a1430); box-shadow: 0 0 0 1px #000, inset 0 0 0 1px #ff8aa2 !important; }
+.u-hp { background: linear-gradient(180deg, #2f9a64, #155a3a); box-shadow: 0 0 0 1px #000, inset 0 0 0 1px #8ff0b8 !important; }
+.unit-tags { top: auto; bottom: calc(7% + 1.9em); left: 50%; transform: translateX(-50%); z-index: 3; display: flex; gap: 2px; white-space: nowrap; }
+.tg { font-size: 9px; line-height: 13px; padding: 0 4px; background: rgba(10,8,14,.9); box-shadow: 0 0 0 1px #000; }
+.tg.ward { color: #9fd0ff; box-shadow: 0 0 0 1px #000, inset 0 0 0 1px #4a86c8; }
 .tg.rush { box-shadow: 0 0 0 1px #000, inset 0 0 0 1px #c8762a; }
 .tg.partner { color: #1a1206; background: #e8c070; box-shadow: 0 0 0 1px #000; }
-.unit.ward { box-shadow: 0 0 0 1px #000, 0 0 0 2px #4a86c8, 0 3px 0 rgba(0,0,0,.35); }
-.unit.partner, .unit.partner.ward { box-shadow: 0 0 0 1px #000, 0 0 0 2px #e8c070, 0 3px 0 rgba(0,0,0,.35); }
-.unit.partner .unit-name { color: #ffe6b0; }
+.unit .zz { z-index: 3; }
+.unit.empty { aspect-ratio: 576 / 800; }
 @media (min-width: 721px) {
   .unit-name { font-size: 12px; }
-  .unit-stats span { min-width: 24px; height: 21px; font-size: 14px; }
+  .unit-stats span { min-width: 24px; height: 24px; font-size: 14px; }
   .tg { font-size: 10px; line-height: 14px; }
-  .field { gap: 14px; padding-top: 6px; }
+  .field { gap: 12px; }
+  .unit { width: min(clamp(84px, 9.4vw, 128px), calc((100dvh - 250px) / 3 / 1.42)); }
 }
 
 
@@ -1742,3 +1748,8 @@ body.has-banner .title-ov { padding-bottom: 64px; }
   .tg { font-size: 8px; line-height: 12px; }
   .tip { top: 6px; bottom: auto; max-height: calc(100svh - 12px); }
 }
+
+
+.end-turn.ready { animation: none; filter: brightness(1.15); }
+
+.arena .monster.portrait { max-height: var(--mcap); }

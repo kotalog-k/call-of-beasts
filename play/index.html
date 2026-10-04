@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <script>
+if (/[?&]embed=1/.test(location.search) && window.parent !== window) document.documentElement.classList.add('ad-embed');
 if (location.hash === '#demo') { Storage.prototype.setItem = function () {}; Storage.prototype.removeItem = function () {}; }
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -19,10 +20,10 @@ if (location.hash === '#demo') { Storage.prototype.setItem = function () {}; Sto
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="fx.css?v=236">
-<link rel="stylesheet" href="cards.css?v=236">
-<link rel="stylesheet" href="style.css?v=236">
-<link rel="stylesheet" href="ad.css?v=236">
+<link rel="stylesheet" href="fx.css?v=238">
+<link rel="stylesheet" href="cards.css?v=238">
+<link rel="stylesheet" href="style.css?v=238">
+<link rel="stylesheet" href="ad.css?v=238">
 </head>
 <body>
 <div id="game">
@@ -69,20 +70,20 @@ if (location.hash === '#demo') { Storage.prototype.setItem = function () {}; Sto
   <div class="tip" id="tip" hidden></div>
 </div>
 
-<script src="data.js?v=236"></script>
-<script src="rules.js?v=236"></script>
-<script src="art.js?v=236"></script>
-<script src="fx.js?v=236"></script>
-<script src="pxfx.js?v=236"></script>
-<script src="cards.js?v=236"></script>
-<script src="audio.js?v=236"></script>
-<script src="art/w/manifest.js?v=236"></script>
-<script src="ads-config.js?v=236"></script>
-<script src="ads.js?v=236"></script>
-<script src="app.js?v=236"></script>
-<script src="art/ad/orbit/orbit.js?v=236"></script>
-<script src="art/ad/class/class.js?v=236"></script>
-<script src="ad.js?v=236"></script>
+<script src="data.js?v=238"></script>
+<script src="rules.js?v=238"></script>
+<script src="art.js?v=238"></script>
+<script src="fx.js?v=238"></script>
+<script src="pxfx.js?v=238"></script>
+<script src="cards.js?v=238"></script>
+<script src="audio.js?v=238"></script>
+<script src="art/w/manifest.js?v=238"></script>
+<script src="ads-config.js?v=238"></script>
+<script src="ads.js?v=238"></script>
+<script src="app.js?v=238"></script>
+<script src="art/ad/orbit/orbit.js?v=238"></script>
+<script src="art/ad/class/class.js?v=238"></script>
+<script src="ad.js?v=238"></script>
 <script>
 // ホーム画面のアプリとして、電波がなくても遊べるように（宣伝の中の見本とアプリ版では使わない）
 if ('serviceWorker' in navigator && location.hash !== '#demo' && !(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()))

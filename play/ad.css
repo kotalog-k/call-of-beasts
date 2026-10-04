@@ -78,3 +78,9 @@
 .ad-frame { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; z-index: 2; pointer-events: none; }
 .ad-orbit.full .ad-frame { opacity: 0; transition: opacity .35s steps(3); }
 .ad-orbit.full .ad-game { transition: transform .4s cubic-bezier(.3,.7,.4,1); }
+
+.ad-load { position: absolute; left: 50%; bottom: 12%; width: min(240px, 50vw); height: 2px; transform: translateX(-50%); background: rgba(255,255,255,.15); }
+.ad-load i { display: block; height: 100%; width: 0; background: rgba(255,255,255,.7); transition: width .2s; }
+
+html.ad-embed #game, html.ad-embed .coach { visibility: hidden !important; }
+html.ad-embed, html.ad-embed body { background: #000; }
