@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Call of Beasts</title>
+<meta name="description" content="召喚獣とカードで戦う、一人用のデッキ構築ローグライク。ブラウザですぐ遊べます。">
+<meta property="og:title" content="Call of Beasts">
+<meta property="og:description" content="召喚獣とカードで戦う、一人用のデッキ構築ローグライク。">
+<meta property="og:image" content="img/shot_boss.jpg">
+<meta name="theme-color" content="#1e1426">
+<link rel="icon" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #17111d; --ink: #f1e9df; --muted: #a99db0; --line: rgba(241,233,223,.13);
+  --glass: rgba(30,22,38,.66); --accent: #ff7a3c; --accent-ink: #ffb07a;
+}
+:root[data-theme="light"] {
+  --bg: #efe9e4; --ink: #241a2a; --muted: #6e6274; --line: rgba(36,26,42,.13);
+  --glass: rgba(255,255,255,.66); --accent: #d4521c; --accent-ink: #b8461a;
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Yu Gothic', sans-serif; font-size: 14px; line-height: 1.9; }
+a { color: inherit; }
+img { display: block; max-width: 100%; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 32px; }
+header.top { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; gap: 16px; }
+.logo { font-family: 'DotGothic16', monospace; font-size: 18px; letter-spacing: .06em; text-decoration: none; }
+.pill { border: 1px solid var(--line); background: var(--glass); backdrop-filter: blur(10px); border-radius: 999px; padding: 4px 14px; font-size: 11.5px; letter-spacing: .12em; color: var(--muted); }
+
+/* 主役：プレイ画面 */
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 40px; align-items: end; padding: 24px 0 56px; }
+.screen { position: relative; border-radius: 6px; overflow: hidden; box-shadow: 0 30px 80px -20px rgba(255,110,40,.35), 0 0 0 1px var(--line); aspect-ratio: 16 / 9; background: #000; }
+.screen img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; opacity: 0; transition: opacity .8s; }
+.screen img.on { opacity: 1; }
+.kicker { font-size: 10.5px; letter-spacing: .24em; color: var(--muted); display: flex; align-items: center; gap: 10px; }
+.kicker::before { content: ''; width: 28px; height: 1px; background: var(--muted); }
+h1 { font-family: 'DotGothic16', monospace; font-weight: 400; font-size: clamp(32px, 4.2vw, 46px); line-height: 1.15; letter-spacing: .03em; margin: 14px 0 16px; }
+h1 em { font-style: normal; color: var(--accent-ink); }
+.lead { color: var(--muted); font-size: 13px; margin: 0 0 24px; max-width: 30em; }
+.actions { display: grid; gap: 10px; }
+.btn { display: flex; justify-content: space-between; align-items: center; text-decoration: none; border-radius: 12px; padding: 13px 18px; font-size: 14px; font-weight: 500; border: 1px solid var(--line); background: var(--glass); backdrop-filter: blur(10px); transition: transform .3s cubic-bezier(.3,1.6,.5,1); }
+.btn small { font-size: 11px; color: var(--muted); font-weight: 400; }
+.btn.main { background: var(--accent); color: #1a0c06; border-color: transparent; }
+.btn.main small { color: rgba(26,12,6,.7); }
+.btn:hover { transform: translateY(-2px); }
+.btn:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn[aria-disabled="true"] { opacity: .5; pointer-events: none; }
+
+section { padding: 48px 0; border-top: 1px solid var(--line); }
+h2 { font-family: 'DotGothic16', monospace; font-weight: 400; font-size: 22px; letter-spacing: .04em; margin: 8px 0 24px; }
+.feats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+.feat img { border-radius: 4px; box-shadow: 0 0 0 1px var(--line); aspect-ratio: 16 / 9; object-fit: cover; width: 100%; }
+.feat b { display: block; margin: 14px 0 4px; font-size: 14px; }
+.feat p { margin: 0; color: var(--muted); font-size: 12.5px; }
+.how { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; color: var(--muted); font-size: 12.5px; }
+.how b { color: var(--ink); display: block; margin-bottom: 4px; font-size: 13px; }
+footer { padding: 32px 0 48px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; color: var(--muted); font-size: 11.5px; }
+footer nav { display: flex; gap: 18px; }
+.theme { border: 1px solid var(--line); background: var(--glass); color: var(--muted); border-radius: 999px; padding: 4px 12px; font: inherit; font-size: 11px; cursor: pointer; }
+
+@media (max-width: 820px) {
+  .wrap { padding: 0 16px; }
+  .hero { grid-template-columns: minmax(0, 1fr); gap: 24px; padding-top: 8px; }
+  .feats, .how { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { .screen img { transition: none; } .btn { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="logo" href="./">Call of Beasts</a>
+    <span class="pill">無料で遊べます</span>
+  </header>
+
+  <main class="hero">
+    <div class="screen" id="screen" aria-label="プレイ画面">
+      <img class="on" src="img/shot_boss.jpg" alt="竜のボスとの戦い">
+      <img src="img/shot_pack.jpg" alt="パックを開けたところ">
+      <img src="img/shot_battle.jpg" alt="戦闘の画面">
+      <img src="img/shot_map.jpg" alt="地図の画面">
+    </div>
+    <div>
+      <div class="kicker">Deck-building Roguelike</div>
+      <h1>召喚獣と、<br><em>カード</em>で戦う。</h1>
+      <p class="lead">相棒の召喚獣とカードの山札で、10階の先のボスをめざす一人用のゲームです。負けても、集めたカードと相棒の強さは次の冒険へ。</p>
+      <div class="actions">
+        <a class="btn main" href="play/">ブラウザで遊ぶ</a>
+        <a class="btn" href="play/#ad2">紹介映像を見る</a>
+        <a class="btn" href="#app" id="store">スマホのアプリ</a>
+      </div>
+    </div>
+  </main>
+
+  <section>
+    <div class="kicker">Features</div>
+    <h2>あそびかた</h2>
+    <div class="feats">
+      <div class="feat"><img src="img/shot_battle.jpg" alt="" loading="lazy"><b>カードを出して戦う</b><p>毎ターン、MPの分だけカードを出せます。攻撃・防御・魔法と、相棒の召喚獣の力を組み合わせて。</p></div>
+      <div class="feat"><img src="img/shot_map.jpg" alt="" loading="lazy"><b>道を選んで進む</b><p>戦い・売店・できごと。どの道を通るかで、デッキの育ち方が変わります。</p></div>
+      <div class="feat"><img src="img/shot_pack.jpg" alt="" loading="lazy"><b>パックでカードを集める</b><p>手に入れたお金でパックを開け、カードを集めます。めずらしい伝説のカードも。</p></div>
+    </div>
+  </section>
+
+  <section id="app">
+    <div class="kicker">App</div>
+    <h2>スマホで遊ぶ</h2>
+    <div class="how">
+      <div><b>いますぐ：ホーム画面に置く</b>iPhone は Safari で「共有」→「ホーム画面に追加」。Android は Chrome のメニュー →「アプリをインストール」。アプリのように全画面で遊べます。</div>
+      <div><b>アプリストア</b>Google Play と App Store で準備中です。</div>
+    </div>
+  </section>
+
+  <footer>
+    <span>© 2026 Call of Beasts</span>
+    <nav><a href="privacy.html">プライバシーポリシー</a><button class="theme" id="theme" aria-pressed="false">明るく</button></nav>
+  </footer>
+</div>
+<script>
+(() => {
+  const ims = [...document.querySelectorAll('#screen img')];
+  let i = 0;
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(() => { ims[i].classList.remove('on'); i = (i + 1) % ims.length; ims[i].classList.add('on'); }, 3200);
+  const b = document.getElementById('theme');
+  let t = null; try { t = localStorage.getItem('cob-theme'); } catch (e) {}
+  const set = v => { document.documentElement.dataset.theme = v; b.setAttribute('aria-pressed', v === 'light'); b.textContent = v === 'light' ? '暗く' : '明るく'; try { localStorage.setItem('cob-theme', v); } catch (e) {} };
+  if (t) set(t);
+  b.onclick = () => set(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light');
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<script>
+if (location.hash === '#demo') { Storage.prototype.setItem = function () {}; Storage.prototype.removeItem = function () {}; }
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1e1426">
+<link rel="icon" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Call of Beasts">
+<title>Call of Beasts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="fx.css?v=229">
+<link rel="stylesheet" href="cards.css?v=229">
+<link rel="stylesheet" href="style.css?v=229">
+<link rel="stylesheet" href="ad.css?v=229">
+</head>
+<body>
+<div id="game">
+  <div id="bg" aria-hidden="true"></div>
+
+  <header class="top">
+    <div class="plate stage-name" id="stage-name"></div>
+    <div class="piles">
+      <span class="pile gold-pile" title="お金"><small>お金</small><b id="n-gold">0</b></span>
+      <span class="pile" title="山札"><small>山札</small><b id="n-draw">0</b></span>
+      <span class="pile" title="捨て札"><small>捨て札</small><b id="n-discard">0</b></span>
+    </div>
+  </header>
+
+  <main class="arena">
+    <div class="field" id="field" aria-label="召喚獣"></div>
+    <div class="enemy" id="enemy">
+      <div class="intent" id="intent"></div>
+      <div class="monster portrait" id="monster"></div>
+      <div class="plate enemy-plate">
+        <div class="plate-name"><span class="attr-gem" id="e-attr"></span><span id="e-name"></span><span class="block-badge" id="e-block" hidden></span></div>
+        <div class="bar hp enemy-hp"><i id="e-hpbar"></i><b id="e-hp"></b></div>
+        <div class="status" id="e-status"></div>
+      </div>
+      
+      <div class="plate player-hud" id="player">
+        <div class="plate-name"><span id="p-name"></span><span class="status" id="p-status"></span><span class="block-badge" id="p-block" hidden></span></div>
+        <div class="bar hp"><i id="p-hpbar"></i><b id="p-hp"></b></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bottom">
+    <div class="energy" id="energy" aria-label="MP"><small class="mp-label">MP</small><b id="energy-n">1</b><small id="energy-max">/1</small><div class="mp-pips" id="mp-pips"></div></div>
+    <div class="hand" id="hand"></div>
+    <div class="turn-box">
+      <div class="toggles"><button class="tgl" id="auto" title="使えるカードが無くなったら自動でターン終了">自動</button><button class="tgl" id="fast" title="演出を速くする">速く</button><button class="tgl" data-snd="bgm" aria-pressed="true">BGM</button><button class="tgl" data-snd="sfx" aria-pressed="true">効果音</button></div>
+      <button class="end-turn" id="end-turn">ターン終了</button>
+    </div>
+  </footer>
+
+  <div class="flash" id="flash" aria-hidden="true"></div>
+  <div class="overlay" id="overlay" hidden></div>
+  <div class="tip" id="tip" hidden></div>
+</div>
+
+<script src="data.js?v=229"></script>
+<script src="rules.js?v=229"></script>
+<script src="art.js?v=229"></script>
+<script src="fx.js?v=229"></script>
+<script src="pxfx.js?v=229"></script>
+<script src="cards.js?v=229"></script>
+<script src="audio.js?v=229"></script>
+<script src="art/w/manifest.js?v=229"></script>
+<script src="ads-config.js?v=229"></script>
+<script src="ads.js?v=229"></script>
+<script src="app.js?v=229"></script>
+<script src="art/ad/orbit/orbit.js?v=229"></script>
+<script src="art/ad/class/class.js?v=229"></script>
+<script src="ad.js?v=229"></script>
+<script>
+// ホーム画面のアプリとして、電波がなくても遊べるように（宣伝の中の見本とアプリ版では使わない）
+if ('serviceWorker' in navigator && location.hash !== '#demo' && !(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()))
+  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+</script>
+</body>
+</html>

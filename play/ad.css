@@ -1,0 +1,80 @@
+
+.ad { position: fixed; inset: 0; z-index: 95; overflow: hidden; background: #000; cursor: pointer; transition: opacity .6s steps(6); }
+.ad.cut { z-index: 70; }
+.ad.out { opacity: 0; pointer-events: none; }
+.ad-ready { display: grid; place-items: center; }
+.ad-play { width: 0; height: 0; border-left: 34px solid rgba(255,255,255,.75); border-top: 22px solid transparent; border-bottom: 22px solid transparent; }
+.ad-scene { position: absolute; inset: 0; visibility: hidden; }
+.ad-scene.on { visibility: visible; }
+.ad-stage { position: absolute; left: 50%; top: 50%; width: 0; height: 0; perspective: 900px; transform-origin: 0 0; }
+.ad-cam { position: absolute; left: 0; top: 0; transform-style: preserve-3d; }
+.ad-p { position: absolute; image-rendering: pixelated; backface-visibility: visible; }
+.ad-b { position: absolute; left: 0; top: 0; width: 0; height: 0; transform-style: preserve-3d; }
+.ad-b img { position: absolute; left: 0; bottom: 0; translate: -50% 0; height: auto; image-rendering: pixelated; }
+.ad-sh { position: absolute; left: 0; top: 0; border-radius: 50%; background: radial-gradient(closest-side, rgba(10,2,4,.55), rgba(10,2,4,.55) 60%, transparent 62%); transform: translate(-50%, -50%) rotateX(90deg) scaleY(.5); }
+.ad-b.noshadow .ad-sh { display: none; }
+
+
+.ad-room .ad-layer.back.bolt { animation: ad-bolt .5s steps(1); }
+@keyframes ad-bolt { 0%, 30% { filter: brightness(2.2) saturate(.6); } 15%, 100% { filter: none; } }
+.ad-rain { position: absolute; overflow: hidden;
+  background: repeating-linear-gradient(105deg, transparent 0 22px, rgba(160,190,255,.35) 22px 24px, transparent 24px 47px),
+              repeating-linear-gradient(100deg, transparent 0 31px, rgba(160,190,255,.22) 31px 33px, transparent 33px 61px);
+  animation: ad-rain .25s steps(3) infinite; }
+@keyframes ad-rain { to { background-position: -40px 120px, -30px 160px; } }
+.ad-rain.bolt { animation: ad-rain .25s steps(3) infinite, ad-winbolt .3s steps(1); }
+@keyframes ad-winbolt { 0%, 40% { box-shadow: inset 0 0 0 999px rgba(230,240,255,.85); } 20%, 100% { box-shadow: none; } }
+.ad-tvscreen { overflow: hidden; background-color: #1a0608 !important; filter: brightness(1.2); animation: ad-flick .12s steps(2) infinite; }
+@keyframes ad-flick { 50% { filter: brightness(1.05); } }
+.ad-tvhero { position: absolute; left: 34%; bottom: 8%; width: 22%; image-rendering: pixelated; }
+.ad-scan { position: absolute; inset: 0; background: repeating-linear-gradient(180deg, rgba(0,0,0,.35) 0 2px, transparent 2px 4px); }
+.ad-tvscreen.fill .ad-scan { animation: ad-scan .8s steps(4) forwards; }
+@keyframes ad-scan { to { background: repeating-linear-gradient(180deg, rgba(0,0,0,.6) 0 1px, transparent 1px 2px); } }
+.ad-tvglow { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 70% 55%, rgba(120,180,255,.10), transparent 60%); }
+
+
+.ad-lava { background: #12060a; }
+.ad-sky { position: absolute; left: 0; right: 0; top: 0; height: 50%; background: url(art/ad/sky_lava.png) repeat-x; background-size: auto 100%; image-rendering: pixelated; }
+.ad-far { position: absolute; left: 0; top: 0; width: 1px; height: 1px; }
+.ad-lavaflow { background: url(art/ad/lava.png) 0 0 / 256px 256px repeat; filter: brightness(1.1); box-shadow: 0 0 0 0 transparent; }
+.ad-rock { background: url(art/ad/basalt.png) 0 0 / 256px 256px repeat; }
+.ad-cliff { background: url(art/ad/cliff.png) 0 0 / 256px 100% repeat-x; }
+.ad-cliff.far { background-size: 256px 100%; filter: brightness(.7); }
+.ad-bridge { background: url(art/ad/bridge.png) 0 0 / 72px 100% repeat-x; transform-origin: 50% 50%; }
+.ad-bridge { background: url(art/ad/bridge.png) center / 100% 100%; }
+.ad-bridge-side { background: linear-gradient(180deg, #3a2a26, #1a1012); }
+
+.ad-lava::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(0deg, rgba(255,90,20,.18), transparent 55%); mix-blend-mode: screen; }
+.ad-embers { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+.ad-embers i { position: absolute; bottom: -10px; width: 6px; height: 6px; background: #ffb040; box-shadow: 0 0 8px 2px rgba(255,120,30,.8); animation: ad-ember 2.4s steps(12) infinite; }
+@keyframes ad-ember { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translate(40px, -110vh); opacity: 0; } }
+.ad-b.imp img { filter: drop-shadow(0 0 6px rgba(255,80,30,.6)); }
+.ad-b.card img { filter: drop-shadow(0 0 8px #ffe08a); }
+.ad-dmg { position: fixed; z-index: 5; font-size: clamp(40px, 6vw, 80px); color: #fff1c8; text-shadow: var(--outline); opacity: 0; pointer-events: none; }
+.ad-dmg.on { animation: op-dmg .7s steps(6) forwards; }
+.ad-flash { position: absolute; inset: 0; z-index: 9; pointer-events: none; background: var(--c, #fff); animation: op-flash .28s steps(3) forwards; }
+
+.ad-flash.crt { animation: ad-crt .3s steps(4) forwards; }
+@keyframes ad-crt { 0% { clip-path: inset(0 0 0 0); opacity: 1; } 50% { clip-path: inset(48% 0 48% 0); opacity: 1; } 100% { clip-path: inset(50% 0 50% 0); opacity: 0; } }
+.ad .fx-layer { z-index: 8; }
+
+.ad-game { position: absolute; left: 0; top: 0; border: 0; transform-origin: 0 0; pointer-events: none; background: #000; }
+.ad-tvscreen { background: #000 !important; }
+.ad-scan { z-index: 2; }
+.ad-tvscreen.fill .ad-scan { animation: ad-scan-out .9s steps(4) forwards; }
+@keyframes ad-scan-out { 0% { opacity: 1; } 100% { opacity: 0; } }
+.ad-lamp { position: absolute; width: 0; height: 0; }
+.ad-lamp::after { content: ''; position: absolute; left: -260px; top: -200px; width: 520px; height: 420px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255,180,90,.22), transparent); animation: ad-lamp 1.7s steps(3) infinite; }
+@keyframes ad-lamp { 50% { opacity: .7; } }
+.ad-layer.bolt { animation: ad-bolt .5s steps(1); }
+
+.ad-tvflick { position: absolute; left: 0; top: 0; width: 60%; height: 100%; pointer-events: none;
+  background: radial-gradient(ellipse at 5% 45%, rgba(120,180,255,.22), transparent 60%); animation: ad-tvflick .9s steps(3) infinite; }
+@keyframes ad-tvflick { 33% { opacity: .6; } 66% { opacity: 1; filter: hue-rotate(40deg); } }
+
+.ad-orbit { position: absolute; overflow: hidden; background: #000; }
+.ad-orbit .ad-game { position: absolute; left: 0; top: 0; transform-origin: 0 0; z-index: 1; }
+.ad-frame { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; z-index: 2; pointer-events: none; }
+.ad-orbit.full .ad-frame { opacity: 0; transition: opacity .35s steps(3); }
+.ad-orbit.full .ad-game { transition: transform .4s cubic-bezier(.3,.7,.4,1); }
