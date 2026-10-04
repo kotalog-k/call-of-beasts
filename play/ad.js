@@ -197,7 +197,7 @@
    } catch (e) {}
   };
   const fit = () => {
-   const w = Math.max(innerWidth, innerHeight * 16 / 9), h = w * 9 / 16;
+   const w = Math.min(innerWidth, innerHeight * 16 / 9), h = w * 9 / 16;
    css(box, {
     width: w + "px",
     height: h + "px",
